@@ -20,7 +20,7 @@ int tcp_socket()
     return socket_descriptor;
 }
 
-int create_tcp_server(char *ip_address, unsigned short port)
+int create_tcp_server(char *ip_address, unsigned short port, int backlog)
 {
 	int socket_descriptor = tcp_socket();
 
@@ -45,7 +45,7 @@ int create_tcp_server(char *ip_address, unsigned short port)
 		return -1;
 	}
 
-    if (listen(socket_descriptor, 1) == -1) {
+    if (listen(socket_descriptor, backlog) == -1) {
         close(socket_descriptor);
         return -1;
     }

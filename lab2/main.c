@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     char *host = argv[1];
     char *port = argv[2];
 
-    int socket_descriptor = create_tcp_server(host, atoi(port));
+    int socket_descriptor = create_tcp_server(host, atoi(port), 1);
 
 	if(socket_descriptor == -1)
 	{
