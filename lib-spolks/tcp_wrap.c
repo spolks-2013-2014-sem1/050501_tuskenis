@@ -9,7 +9,7 @@
 int tcp_socket()
 {
     int socket_descriptor = 0;
-    struct protoent *protocol = getprotobyname("tcp");
+    struct protoent *protocol = (struct protoent *) getprotobyname("tcp");
 
     if (protocol == NULL)
         return -1;
@@ -22,8 +22,6 @@ int tcp_socket()
 int tcp_bind(int socket_descriptor, char *ip_address, unsigned short port)
 {
     struct sockaddr_in addr;
-
-	memset(&addr, 0, sizeof(struct sockaddr_in));
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
