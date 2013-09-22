@@ -18,6 +18,9 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    char *ip_str = argv[1];
+    char *port_str = argv[2];
+
     int socket_descriptor = tcp_socket();
 
     if (socket_descriptor == -1) {
@@ -25,7 +28,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    if (tcp_bind(socket_descriptor, argv[1], atoi(argv[2])) == -1) {
+    if (tcp_bind(socket_descriptor, ip_str, atoi(port_str)) == -1) {
         printf("Error: binding socket failed.\n");
         close(socket_descriptor);
         return 0;
@@ -41,8 +44,9 @@ int main(int argc, char **argv)
 
     int accepted_socket;
 
-    do
+    do {
         accepted_socket = accept(socket_descriptor, NULL, NULL);
+    }
     while (accepted_socket == -1);
 
     printf("Connected.\n");
