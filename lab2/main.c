@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <string.h>
 #include "../lib-spolks/tcp_wrap.h"
 
 #define BUFFER_SIZE 6
@@ -18,27 +19,16 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    char *ip_str = argv[1];
-    char *port_str = argv[2];
+    char *host = argv[1];
+    char *port = argv[2];
 
-    int socket_descriptor = tcp_socket();
+    int socket_descriptor = create_tcp_server(host, atoi(port));
 
-    if (socket_descriptor == -1) {
-        printf("Error: creating socket failed.\n");
-        return 0;
-    }
-
-    if (tcp_bind(socket_descriptor, ip_str, atoi(port_str)) == -1) {
-        printf("Error: binding socket failed.\n");
-        close(socket_descriptor);
-        return 0;
-    }
-
-    if (listen(socket_descriptor, 1) == -1) {
-        printf("Error: setting socket to listening state failed.\n");
-        close(socket_descriptor);
-        return 0;
-    }
+	if(socket_descriptor == -1)
+	{
+		perror("create_tcp_server() error");
+		return 0;
+	}
 
     printf("Awaiting connection...\n");
 

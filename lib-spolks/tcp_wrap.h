@@ -1,2 +1,2 @@
 int tcp_socket();
-int tcp_bind(int socket_descriptor, char *ip_address, unsigned short port);
+int create_tcp_server(char *ip_address, unsigned short port);

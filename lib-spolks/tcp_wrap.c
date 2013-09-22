@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <string.h>
 #include "tcp_wrap.h"
 
 int tcp_socket()
@@ -19,8 +20,13 @@ int tcp_socket()
     return socket_descriptor;
 }
 
-int tcp_bind(int socket_descriptor, char *ip_address, unsigned short port)
+int create_tcp_server(char *ip_address, unsigned short port)
 {
+	int socket_descriptor = tcp_socket();
+
+	if(socket_descriptor == -1)
+		return -1;
+
     struct sockaddr_in addr;
 
 	memset(&addr, 0, sizeof(struct sockaddr_in));
@@ -28,8 +34,21 @@ int tcp_bind(int socket_descriptor, char *ip_address, unsigned short port)
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     if (!inet_aton(ip_address, &addr.sin_addr))
+	{
+		close(socket_descriptor);
         return -1;
+	}
 
-    return bind(socket_descriptor, (struct sockaddr *) &addr,
-                sizeof(addr));
+    if(bind(socket_descriptor, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+	{
+		close(socket_descriptor);
+		return -1;
+	}
+
+    if (listen(socket_descriptor, 1) == -1) {
+        close(socket_descriptor);
+        return -1;
+    }
+
+	return socket_descriptor;
 }
