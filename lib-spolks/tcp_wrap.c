@@ -52,3 +52,26 @@ int create_tcp_server(char *ip_address, unsigned short port, int backlog)
 
 	return socket_descriptor;
 }
+
+int tcp_connect(char *host, unsigned short port)
+{
+	int socket_descriptor = tcp_socket();
+
+	if(socket_descriptor == -1)
+		return -1;
+
+    struct sockaddr_in addr;
+
+	memset(&addr, 0, sizeof(struct sockaddr_in));
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+
+	if(connect(socket_descriptor, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+	{
+		close(socket_descriptor);
+		return -1;
+	}	
+
+	return socket_descriptor;		
+}
