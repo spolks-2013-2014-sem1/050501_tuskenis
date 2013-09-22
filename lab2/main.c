@@ -24,37 +24,34 @@ int main(int argc, char **argv)
 
     int socket_descriptor = create_tcp_server(host, atoi(port), 10);
 
-	if(socket_descriptor == -1)
-	{
-		perror("create_tcp_server() error");
-		return 0;
-	}
+    if (socket_descriptor == -1) {
+        perror("create_tcp_server() error");
+        return 0;
+    }
 
     while (1) {
-		printf("Awaiting connection...\n");
+        printf("Awaiting connection...\n");
 
-		int accepted_socket = accept(socket_descriptor, NULL, NULL);
+        int accepted_socket = accept(socket_descriptor, NULL, NULL);
 
-		if(accepted_socket == -1)
-		{
-			perror("accept() error");
-			continue;
-		}
+        if (accepted_socket == -1) {
+            perror("accept() error");
+            continue;
+        }
 
-		printf("Connected.\n");
+        printf("Connected.\n");
 
-		while(1)
-		{
-        	int bytes_read = recv(accepted_socket, buffer, BUFFER_SIZE, 0);
+        while (1) {
+            int bytes_read = recv(accepted_socket, buffer, BUFFER_SIZE, 0);
 
-        	if (bytes_read <= 0) {
-            	printf("Disconnected.\n");
-				close(accepted_socket);
-            	break;
-        	}
+            if (bytes_read <= 0) {
+                printf("Disconnected.\n");
+                close(accepted_socket);
+                break;
+            }
 
-        	send(accepted_socket, buffer, bytes_read, 0);
-		}
+            send(accepted_socket, buffer, bytes_read, 0);
+        }
     }
 
     close(socket_descriptor);
