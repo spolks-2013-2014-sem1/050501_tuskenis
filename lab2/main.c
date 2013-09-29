@@ -6,19 +6,9 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
-#include <signal.h>
 
 #define BUFFER_SIZE 6
 unsigned char buffer[BUFFER_SIZE];
-
-int server_socket;
-int quit_flag = 0;
-
-void sig_handler(int i)
-{
-	close(server_socket);
-	quit_flag = 1;
-}
 
 int main(int argc, char **argv)
 {
@@ -27,8 +17,6 @@ int main(int argc, char **argv)
         printf("\n    e.g.: ./stcps 127.0.0.1 6677\n\n");
         return 0;
     }
-
-	set_sig_handler(SIGINT, sig_handler);
 
     char *host = argv[1];
     char *port = argv[2];
@@ -40,7 +28,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    while (quit_flag == 0) {
+    while (1) {
         printf("Awaiting connection...\n");
 
         int accepted_socket = accept(socket_descriptor, NULL, NULL);
