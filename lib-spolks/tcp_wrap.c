@@ -9,6 +9,7 @@
 
 int tcp_socket()
 {
+	int so_value = 1;
     int socket_descriptor = 0;
     struct protoent *protocol = getprotobyname("tcp");
 
@@ -16,6 +17,12 @@ int tcp_socket()
         return -1;
 
     socket_descriptor = socket(PF_INET, SOCK_STREAM, protocol->p_proto);
+
+    if(socket_descriptor != -1)
+    {
+		if(setsockopt(socket_descriptor, SOL_SOCKET, SO_REUSEADDR, &so_value, sizeof(so_value)) == -1) 
+			return -1;
+	}
 
     return socket_descriptor;
 }
