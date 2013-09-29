@@ -6,7 +6,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
-#include "../lib-spolks/tcp_wrap.h"
 
 #define BUFFER_SIZE 6
 unsigned char buffer[BUFFER_SIZE];
