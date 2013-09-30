@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <string.h>
 
+// Returns size of file named 'filename' in bytes
 int fsize(char *filename)
 {
     struct stat fs;
@@ -13,6 +14,7 @@ int fsize(char *filename)
     return fs.st_size;
 }
 
+// Writes string representation of 'num' to 'buf'
 int itoa(int num, char *buf)
 {
     int bytes_written = sprintf(buf, "%d", num);
@@ -20,6 +22,7 @@ int itoa(int num, char *buf)
     return bytes_written;
 }
 
+// Changes signal action for 'signum' to 'sig_handler()'
 int set_sig_handler(int signum, void (*sig_handler)(int))
 {
 	struct sigaction sa;
