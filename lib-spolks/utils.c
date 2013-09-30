@@ -34,3 +34,24 @@ int set_sig_handler(int signum, void (*sig_handler)(int))
 	
 	return sigaction(signum, &sa, NULL);
 }
+
+// Acquire file name from file path
+// E.g.:  foldername/filename.x
+// this function returns pointer to string "filename.x"
+char *parse_filename(char *path)
+{
+	char *ptr = path + strlen(path) - 1;
+	int length = 0;
+
+	for(; ptr >= path; ptr--)
+	{
+		if(*ptr == '/') break;
+		length++;
+	}
+
+	if(length == 0) return NULL;
+
+	char *filename = (char*)malloc(length + 1);
+
+	return strcpy(filename, ptr + 1);
+}
