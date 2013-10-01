@@ -56,3 +56,25 @@ char *parse_filename(char *path)
 
 	return strcpy(filename, ptr + 1);
 }
+
+// Creates file with specified size and name
+// filled by random content
+int trash_create(char *path, int size)
+{
+	if(path == NULL || size < 1) return -1;
+
+	FILE *file = fopen(path, "w+");
+
+	if(file == NULL) return -1;
+
+	int errno = 0;
+	char *buffer = (char*)malloc(size);
+
+	if(fwrite(buffer, sizeof(char), size, file) < size) 
+		errno = -1;
+
+	close(file);
+	free(buffer);
+
+	return errno;
+}
