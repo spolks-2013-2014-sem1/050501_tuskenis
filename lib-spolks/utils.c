@@ -67,14 +67,27 @@ int trash_create(char *path, int size)
 
 	if(file == NULL) return -1;
 
+
 	int errno = 0;
+/*
 	char *buffer = (char*)malloc(size);
 
 	if(fwrite(buffer, sizeof(char), size, file) < size) 
 		errno = -1;
+*/
+	for(; size > 0; size--)
+	{
+		char buffer;
+
+		if(fwrite(&buffer, sizeof(char), 1, file) < 1) 
+		{
+			errno = -1;
+			break;
+		}
+	}
 
 	close(file);
-	free(buffer);
+	//free(buffer);
 
 	return errno;
 }
