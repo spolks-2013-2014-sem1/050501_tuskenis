@@ -31,7 +31,6 @@ int set_sig_handler(int signum, void (*sig_handler)(int))
 	memset(&sa, 0, sizeof(struct sigaction));
 
 	sa.sa_handler = sig_handler;
-	sa.sa_flags = SA_RESETHAND;
 	
 	return sigaction(signum, &sa, NULL);
 }
