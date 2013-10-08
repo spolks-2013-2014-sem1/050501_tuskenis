@@ -83,7 +83,10 @@ int send_file(char *filepath, int socket_descriptor)
         if (bytes_read <= 0)
             break;
 
-        send(socket_descriptor, buffer, bytes_read, 0);
+        if(send(socket_descriptor, buffer, bytes_read, 0) == -1) {
+			flose(fd);
+			return -1;
+		}
 
         if (bytes_read < BUFFER_SIZE)
             break;
