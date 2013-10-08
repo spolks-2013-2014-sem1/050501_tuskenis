@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <error.h>
+#include <errno.h>
 
 int main(int argc, char **argv)
 {
@@ -10,7 +11,7 @@ int main(int argc, char **argv)
 		file_size = atoi(argv[1]);
 	}
 
-	if(mkdir("testfolder") == -1)
+	if(mkdir("testfolder") == -1 && errno != EEXIST) 
 		perror("mkdir() error");
 
 	if(trash_create("testfolder/testfile", file_size) == -1)
