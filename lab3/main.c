@@ -84,7 +84,7 @@ int send_file(char *filepath, int socket_descriptor)
             break;
 
         if(send(socket_descriptor, buffer, bytes_read, 0) == -1) {
-			flose(fd);
+			fclose(fd);
 			return -1;
 		}
 
