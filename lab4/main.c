@@ -9,6 +9,8 @@
 #include <string.h>
 #include <error.h>
 #include <signal.h>
+#include "../lib-spolks/tcp_wrap.h"
+#include "../lib-spolks/utils.h"
 
 #define BUFFER_SIZE 256
 

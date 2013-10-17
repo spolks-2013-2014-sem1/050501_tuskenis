@@ -8,6 +8,8 @@
 #include <string.h>
 #include <error.h>
 #include <signal.h>
+#include "../lib-spolks/tcp_wrap.h"
+#include "../lib-spolks/utils.h"
 
 #define BUFFER_SIZE 256
 
@@ -71,7 +73,7 @@ int send_file(char *filepath, int socket_descriptor)
 
 	itoa(file_size, buffer);
 
-	char *filename = (char*)parse_filename(filepath); 		// ? gcc warning if without a cast
+	char *filename = parse_filename(filepath);
     send(socket_descriptor, filename, strlen(filename), 0);	// Send file name
 	free(filename);
     send(socket_descriptor, buffer, strlen(buffer), 0); 	// Send file size
