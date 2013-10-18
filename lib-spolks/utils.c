@@ -69,12 +69,7 @@ int trash_create(char *path, int size)
 
 
 	int errno = 0;
-/*
-	char *buffer = (char*)malloc(size);
 
-	if(fwrite(buffer, sizeof(char), size, file) < size) 
-		errno = -1;
-*/
 	for(; size > 0; size--)
 	{
 		char buffer;
@@ -87,7 +82,6 @@ int trash_create(char *path, int size)
 	}
 
 	close(file);
-	//free(buffer);
 
 	return errno;
 }

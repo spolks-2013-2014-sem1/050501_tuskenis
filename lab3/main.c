@@ -102,8 +102,8 @@ int main(int argc, char **argv)
 {
     if (argc < 4) {
         printf("\n\tUsage:");
-        printf("\n\t   To recv files: %s [-r] [host] [port]", argv[0]);
-        printf("\n\t   To send file : %s <filepath> [host] [port]\n\n", argv[0]);
+        printf("\n\t   To recv files: %s -r <host> <port>", argv[0]);
+        printf("\n\t   To send file : %s <filepath> <host> <port>\n\n", argv[0]);
         return 0;
     }
 
