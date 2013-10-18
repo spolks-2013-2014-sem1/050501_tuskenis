@@ -19,17 +19,17 @@ int quit_flag = 0;
 
 void sig_handler(int i)
 {
-	quit_flag = 1;
+    quit_flag = 1;
 }
 
 void urg_handler(int i)
 {
-	//dummy
+    //dummy
 }
 
 int recv_file(int remote_socket)
 {
-	int totalBytesRecieved = 0;
+    int totalBytesRecieved = 0;
     int bytes_read;
     int file_size;
     char buffer[BUFFER_SIZE];
@@ -42,7 +42,7 @@ int recv_file(int remote_socket)
     buffer[bytes_read] = '\0';
 
     // Create file
-	
+
     fd = fopen(buffer, "w");
     if (fd == NULL)
         return -1;
@@ -55,34 +55,34 @@ int recv_file(int remote_socket)
     file_size = atoi(buffer);
 
     // Recieve file data
-	while(totalBytesRecieved < file_size) {
+    while (totalBytesRecieved < file_size) {
         bytes_read = recv(remote_socket, buffer, BUFFER_SIZE, 0);
 
-		if(sockatmark(remote_socket) == 1) {
-			printf("recieved %d bytes\n", totalBytesRecieved);
+        if (sockatmark(remote_socket) == 1) {
+            printf("recieved %d bytes\n", totalBytesRecieved);
 
-			char cbuf;
-			if(recv(remote_socket, &cbuf, 1, MSG_OOB) < 1) {
-				perror("recv() OOB error");
-			}
+            char cbuf;
+            if (recv(remote_socket, &cbuf, 1, MSG_OOB) < 1) {
+                perror("recv() OOB error");
+            }
 
-			if(bytes_read < 1)
-				continue;
-		}
+            if (bytes_read < 1)
+                continue;
+        }
 
-		if(bytes_read == 0)
-			break;		
+        if (bytes_read == 0)
+            break;
 
         if (bytes_read == -1) {
             fclose(fd);
-			return -1;
-		}
+            return -1;
+        }
 
         fwrite(buffer, sizeof(unsigned char), bytes_read, fd);
-		totalBytesRecieved += bytes_read; 
+        totalBytesRecieved += bytes_read;
     }
 
-	printf("Total bytes recieved: %d\n", totalBytesRecieved);
+    printf("Total bytes recieved: %d\n", totalBytesRecieved);
     fclose(fd);
     return 0;
 }
@@ -97,33 +97,33 @@ int main(int argc, char **argv)
     char *host = argv[1];
     char *port = argv[2];
 
-	set_sig_handler(SIGINT, sig_handler);
-	set_sig_handler(SIGURG, urg_handler);
+    set_sig_handler(SIGINT, sig_handler);
+    set_sig_handler(SIGURG, urg_handler);
 
-	int server_socket = create_tcp_server(host, atoi(port), 10);
+    int server_socket = create_tcp_server(host, atoi(port), 10);
 
-   	if (server_socket == -1) {
-       	perror("create_tcp_server() errno");
-		return 0;
-   	}
-	
-	while (quit_flag == 0) {
-       	int remote_socket = accept(server_socket, NULL, NULL);
+    if (server_socket == -1) {
+        perror("create_tcp_server() errno");
+        return 0;
+    }
 
-       	if (remote_socket == -1) {
-			perror("accept() errno");
-           	continue;
-		}
+    while (quit_flag == 0) {
+        int remote_socket = accept(server_socket, NULL, NULL);
 
-		if(fcntl(remote_socket, F_SETOWN, getpid()) == -1) 
-			perror("fcntl() error");
+        if (remote_socket == -1) {
+            perror("accept() errno");
+            continue;
+        }
 
-       	if (recv_file(remote_socket) == -1)
-           	perror("recv_file() errno");
+        if (fcntl(remote_socket, F_SETOWN, getpid()) == -1)
+            perror("fcntl() error");
 
-       	close(remote_socket);
-   	}
+        if (recv_file(remote_socket) == -1)
+            perror("recv_file() errno");
 
-   	close(server_socket);
+        close(remote_socket);
+    }
+
+    close(server_socket);
     return 0;
 }
