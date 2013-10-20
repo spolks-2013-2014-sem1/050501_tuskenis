@@ -18,6 +18,3 @@ char *parse_filename(char *path);
 // filled by random content
 int trash_create(char *path, int size);
 
-// Calculate 8-bit CRC checksum for byte array
-unsigned char crc8(unsigned char *array, int length);
-

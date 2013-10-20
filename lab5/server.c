@@ -14,7 +14,6 @@
 #include "../lib-spolks/utils.h"
 
 #define BUFFER_SIZE 256
-#define MSG_BUFF_SIZE 16
 
 int quit_flag = 0;
 
@@ -115,20 +114,15 @@ int recv_file_udp(int remote_socket)
 
     // Recieve file data
     while (totalBytesRecieved < file_size) {
-        bytes_read = recv(remote_socket, buffer, MSG_BUFF_SIZE, 0);
+        bytes_read = recv(remote_socket, buffer, BUFFER_SIZE, 0);
 
         if (bytes_read <= 0) {
             fclose(fd);
             return -1;
         }
 
-        totalBytesRecieved += bytes_read - 1;
-
-        if (crc8(buffer, bytes_read) == 0) {
-            fwrite(buffer, sizeof(unsigned char), bytes_read - 1, fd);
-        } else {
-            fprintf(stderr, "CRC checksum does not match.\n");
-        }
+        totalBytesRecieved += bytes_read;
+        fwrite(buffer, sizeof(unsigned char), bytes_read, fd);
     }
 
     printf("Total bytes recieved: %d\n", totalBytesRecieved);
@@ -171,10 +165,9 @@ int main(int argc, char **argv)
     }
     // UDP mode
     if (!strcmp(prot, "udp")) {
-        set_socket_timeout(server_socket, 6);
+        set_socket_timeout(server_socket, 15);
 
         while (quit_flag == 0) {
-            printf("W...\n");
             if (recv_file_udp(server_socket) == -1) {
                 perror("recv_file() error");
             }

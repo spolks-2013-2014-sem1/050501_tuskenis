@@ -12,7 +12,6 @@
 #include "../lib-spolks/utils.h"
 
 #define BUFFER_SIZE 256
-#define MSG_BUFF_SIZE 16
 
 int send_file_tcp(char *filepath, int socket_descriptor)
 {
@@ -91,15 +90,12 @@ int send_file_udp(char *filepath, int socket_descriptor)
 
     // Send file data
     while (1) {
-        bytes_read =
-            fread(buffer, sizeof(unsigned char), MSG_BUFF_SIZE - 1, fd);
+        bytes_read = fread(buffer, sizeof(unsigned char), BUFFER_SIZE, fd);
 
         if (bytes_read <= 0)
             break;
 
-        buffer[bytes_read] = crc8(buffer, bytes_read);
-
-        if (send(socket_descriptor, buffer, bytes_read + 1, 0) == -1) {
+        if (send(socket_descriptor, buffer, bytes_read, 0) == -1) {
             fclose(fd);
             return -1;
         }
