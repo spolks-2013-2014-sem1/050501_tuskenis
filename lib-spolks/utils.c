@@ -57,4 +57,26 @@ char *parse_filename(char *path)
 	return strcpy(filename, ptr + 1);
 }
 
+// Calculate 8-bit CRC checksum for byte array
+unsigned char crc8(unsigned char *array, int length)
+{
+	unsigned char crc = 0xFF;
+	int i;
+	int j;
+
+	for (i = 0; i < length; i++) {
+		crc ^= array[i];
+
+		for (j = 0; j < 8; j++) {
+			if (crc & 0x80) {
+				crc <<= 1;
+				crc ^= 0x31;
+			} else {
+				crc <<= 1;
+			}
+		}
+	}
+
+	return crc;
+}
 
