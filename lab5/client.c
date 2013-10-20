@@ -30,15 +30,15 @@ int send_file_tcp(char *filepath, int socket_descriptor)
     itoa(file_size, buffer);
 
     char *filename = parse_filename(filepath);
-    send(socket_descriptor, filename, strlen(filename), 0);		// Send file name
+    send(socket_descriptor, filename, strlen(filename), 0);     // Send file name
     free(filename);
-    send(socket_descriptor, buffer, strlen(buffer), 0);			// Send file size
+    send(socket_descriptor, buffer, strlen(buffer), 0); // Send file size
 
     // number of file data sending iterations between sending out-of-band data
     int oob_count = (file_size / BUFFER_SIZE) / 5;
 
     // Send file data
-    int i = 0;		// file data sending iterations counter
+    int i = 0;                  // file data sending iterations counter
     while (1) {
         bytes_read = fread(buffer, sizeof(unsigned char), BUFFER_SIZE, fd);
 
@@ -85,18 +85,19 @@ int send_file_udp(char *filepath, int socket_descriptor)
     itoa(file_size, buffer);
 
     char *filename = parse_filename(filepath);
-    send(socket_descriptor, filename, strlen(filename), 0);		// Send file name
+    send(socket_descriptor, filename, strlen(filename), 0);     // Send file name
     free(filename);
-    send(socket_descriptor, buffer, strlen(buffer), 0);			// Send file size
+    send(socket_descriptor, buffer, strlen(buffer), 0); // Send file size
 
     // Send file data
     while (1) {
-        bytes_read = fread(buffer, sizeof(unsigned char), MSG_BUFF_SIZE - 1, fd);
+        bytes_read =
+            fread(buffer, sizeof(unsigned char), MSG_BUFF_SIZE - 1, fd);
 
         if (bytes_read <= 0)
             break;
 
-		buffer[bytes_read] = crc8(buffer, bytes_read);
+        buffer[bytes_read] = crc8(buffer, bytes_read);
 
         if (send(socket_descriptor, buffer, bytes_read + 1, 0) == -1) {
             fclose(fd);
@@ -104,7 +105,7 @@ int send_file_udp(char *filepath, int socket_descriptor)
         }
 
         totalBytesSent += bytes_read;
-		printf("%d bytes sent\n", totalBytesSent);
+        printf("%d bytes sent\n", totalBytesSent);
     }
 
     printf("Total bytes sent: %d\n", totalBytesSent);
@@ -115,42 +116,42 @@ int send_file_udp(char *filepath, int socket_descriptor)
 int main(int argc, char **argv)
 {
     if (argc < 5) {
-        printf("\n\tUsage: %s <filepath> <host> <port> <tcp|udp>\n\n", argv[0]);
+        printf("\n\tUsage: %s <filepath> <host> <port> <tcp|udp>\n\n",
+               argv[0]);
         return 0;
     }
 
     char *filepath = argv[1];
     char *host = argv[2];
     char *port = argv[3];
-	char *protocol = argv[4];
-	int (*send_file_routine) (char*, int);
+    char *protocol = argv[4];
+    int (*send_file_routine) (char *, int);
 
-	if(!strcmp(protocol, "tcp"))
-		send_file_routine = send_file_tcp;
-	else if(!strcmp(protocol, "udp"))
-		send_file_routine = send_file_udp;
-	else {
-		fprintf(stderr, "Invalid protocol specified.\n");
-		return 0;
-	}
+    if (!strcmp(protocol, "tcp"))
+        send_file_routine = send_file_tcp;
+    else if (!strcmp(protocol, "udp"))
+        send_file_routine = send_file_udp;
+    else {
+        fprintf(stderr, "Invalid protocol specified.\n");
+        return 0;
+    }
 
-	int socket_descriptor = create_socket(protocol);
+    int socket_descriptor = create_socket(protocol);
 
     if (socket_descriptor == -1) {
         perror("create_socket() error");
         return 0;
     }
 
-	if (connect_socket(socket_descriptor, host, atoi(port)) == -1) {
-		perror("connect_socket() error");
-		close(socket_descriptor);
-		return 0;
-	}
+    if (connect_socket(socket_descriptor, host, atoi(port)) == -1) {
+        perror("connect_socket() error");
+        close(socket_descriptor);
+        return 0;
+    }
 
-	if (send_file_routine(filepath, socket_descriptor) == -1)
-		perror("send_file() error");
+    if (send_file_routine(filepath, socket_descriptor) == -1)
+        perror("send_file() error");
 
     close(socket_descriptor);
     return 0;
 }
-

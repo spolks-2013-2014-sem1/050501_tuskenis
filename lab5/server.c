@@ -117,22 +117,22 @@ int recv_file_udp(int remote_socket)
     while (totalBytesRecieved < file_size) {
         bytes_read = recv(remote_socket, buffer, MSG_BUFF_SIZE, 0);
 
-		if (bytes_read <= 0) {
-			fclose(fd);
-    		return -1;
-		}
+        if (bytes_read <= 0) {
+            fclose(fd);
+            return -1;
+        }
 
-		totalBytesRecieved += bytes_read - 1;
+        totalBytesRecieved += bytes_read - 1;
 
-		if (crc8(buffer, bytes_read) == 0) {
-			fwrite(buffer, sizeof(unsigned char), bytes_read - 1, fd);
-		} else {
-        	fprintf(stderr, "CRC checksum does not match.\n");
-		}
+        if (crc8(buffer, bytes_read) == 0) {
+            fwrite(buffer, sizeof(unsigned char), bytes_read - 1, fd);
+        } else {
+            fprintf(stderr, "CRC checksum does not match.\n");
+        }
     }
 
     printf("Total bytes recieved: %d\n", totalBytesRecieved);
-	fclose(fd);
+    fclose(fd);
     return 0;
 }
 
@@ -146,46 +146,44 @@ int main(int argc, char **argv)
 
     char *host = argv[1];
     char *port = argv[2];
-	char *prot = argv[3];
+    char *prot = argv[3];
 
     set_sig_handler(SIGINT, sig_handler);
     set_sig_handler(SIGURG, urg_handler);
 
-	int server_socket = create_socket(prot);
+    int server_socket = create_socket(prot);
 
     if (server_socket == -1) {
         perror("create_socket() error");
         return 0;
     }
 
-	if (bind_socket(server_socket, host, atoi(port)) == -1) {
-		perror("bind_socket() error");
-		close(server_socket);
-		return 0;
-	}
-
-	if (!strcmp(prot, "tcp") && listen(server_socket, 10) == -1) {
-		perror("listen() error");
-		close(server_socket);
-		return 0;
+    if (bind_socket(server_socket, host, atoi(port)) == -1) {
+        perror("bind_socket() error");
+        close(server_socket);
+        return 0;
     }
 
-	// UDP mode
-	if (!strcmp(prot, "udp")) {
-		set_socket_timeout(server_socket, 6);
+    if (!strcmp(prot, "tcp") && listen(server_socket, 10) == -1) {
+        perror("listen() error");
+        close(server_socket);
+        return 0;
+    }
+    // UDP mode
+    if (!strcmp(prot, "udp")) {
+        set_socket_timeout(server_socket, 6);
 
-		while (quit_flag == 0) {
-			printf("W...\n");
-			if (recv_file_udp(server_socket) == -1) {
-				perror("recv_file() error");
-			}
-		}
+        while (quit_flag == 0) {
+            printf("W...\n");
+            if (recv_file_udp(server_socket) == -1) {
+                perror("recv_file() error");
+            }
+        }
 
-		close(server_socket);
-		return 0;
-	}
-
-	// TCP mode
+        close(server_socket);
+        return 0;
+    }
+    // TCP mode
     while (quit_flag == 0) {
         int remote_socket = accept(server_socket, NULL, NULL);
 
