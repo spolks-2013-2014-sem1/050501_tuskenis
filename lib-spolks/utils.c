@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <signal.h>
-#include <string.h>
 #include "utils.h"
 
 // Returns size of file named 'filename' in bytes

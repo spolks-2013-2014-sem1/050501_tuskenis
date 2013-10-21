@@ -1,4 +1,9 @@
 // Header file for utils lib
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <string.h>
 
 // Returns size of file named 'filename' in bytes
 int fsize(char *filename);
