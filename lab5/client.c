@@ -100,6 +100,12 @@ int send_file_udp(char *filepath, int socket_descriptor)
             return -1;
         }
 
+		// Wait reply
+		if (recv(socket_descriptor, buffer, 1, 0) < 1) {
+			fclose(fd);
+			return -1;
+		}
+
         totalBytesSent += bytes_read;
         printf("%d bytes sent\n", totalBytesSent);
     }
@@ -144,6 +150,8 @@ int main(int argc, char **argv)
         close(socket_descriptor);
         return 0;
     }
+
+	set_socket_timeout(socket_descriptor, 15);
 
     if (send_file_routine(filepath, socket_descriptor) == -1)
         perror("send_file() error");

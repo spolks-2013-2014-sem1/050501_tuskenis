@@ -116,12 +116,18 @@ int recv_file_udp(int remote_socket)
 
     // Recieve file data
     while (totalBytesRecieved < file_size) {
-        bytes_read = recv(remote_socket, buffer, BUFFER_SIZE, 0);
+		int sockaddr_len = sizeof(struct sockaddr);
+		struct sockaddr addr;
+
+		bytes_read = recvfrom(remote_socket, buffer, BUFFER_SIZE, 0, &addr, &sockaddr_len);
 
         if (bytes_read <= 0) {
             fclose(fd);
             return -1;
         }
+
+		// Send reply
+		sendto(remote_socket, "x", 1, 0, &addr, sockaddr_len);
 
         totalBytesRecieved += bytes_read;
         fwrite(buffer, sizeof(unsigned char), bytes_read, fd);
