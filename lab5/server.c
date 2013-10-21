@@ -112,6 +112,8 @@ int recv_file_udp(int remote_socket)
     buffer[bytes_read] = '\0';
     file_size = atoi(buffer);
 
+	set_socket_timeout(remote_socket, 15);
+
     // Recieve file data
     while (totalBytesRecieved < file_size) {
         bytes_read = recv(remote_socket, buffer, BUFFER_SIZE, 0);
@@ -124,6 +126,8 @@ int recv_file_udp(int remote_socket)
         totalBytesRecieved += bytes_read;
         fwrite(buffer, sizeof(unsigned char), bytes_read, fd);
     }
+
+	set_socket_timeout(remote_socket, 0);
 
     printf("Total bytes recieved: %d\n", totalBytesRecieved);
     fclose(fd);
@@ -165,7 +169,6 @@ int main(int argc, char **argv)
     }
     // UDP mode
     if (!strcmp(prot, "udp")) {
-        set_socket_timeout(server_socket, 15);
 
         while (quit_flag == 0) {
             if (recv_file_udp(server_socket) == -1) {
