@@ -23,3 +23,6 @@ char *parse_filename(char *path);
 // filled by random content
 int trash_create(char *path, int size);
 
+// Check file for existing
+int is_file_exists(char *filename);
+

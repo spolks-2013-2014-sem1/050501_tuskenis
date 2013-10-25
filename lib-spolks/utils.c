@@ -52,3 +52,16 @@ char *parse_filename(char *path)
 	return strcpy(filename, ptr + 1);
 }
 
+// Check file for existing
+int is_file_exists(char *filename)
+{
+    FILE *fd = fopen(filename, "r");
+
+    if (fd == NULL) {
+        return 0;
+    } else {
+        fclose(fd);
+        return 1;
+    }
+}
+
