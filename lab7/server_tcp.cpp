@@ -56,6 +56,8 @@ void TcpServer(int server_socket)
     }
 
     threads.clear();
+    pthread_mutex_unlock(&vector_mutex);
+    pthread_mutex_destroy(&vector_mutex);
 }
 
 void *RecieveThreadProc(void *arg)
