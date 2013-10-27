@@ -83,12 +83,14 @@ int send_file_udp(char *filepath, int socket_descriptor)
     if (fd == NULL || file_size < 1)
         return -1;
 
-    itoa(file_size, buffer);
-
+    // Send filename
     char *filename = parse_filename(filepath);
-    send(socket_descriptor, filename, strlen(filename), 0);     // Send file name
+    strcpy(buffer, filename);
+    send(socket_descriptor, buffer, BUFFER_SIZE, 0);
     free(filename);
-    send(socket_descriptor, buffer, strlen(buffer), 0); // Send file size
+    // Send file size
+    itoa(file_size, buffer);
+    send(socket_descriptor, buffer, BUFFER_SIZE, 0);
 
     // Send file data
     while (1) {
