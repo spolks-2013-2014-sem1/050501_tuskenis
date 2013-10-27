@@ -27,8 +27,6 @@ void UdpServer(int server_socket)
         long in_addr = address.sin_addr.s_addr; // network address
 
         if (mapAddrFile.find(in_addr) == mapAddrFile.end()) {
-            // here buffer contains filename without string-terminator
-            buffer[bytes_read] = '\0';
 
             if (is_file_exists(buffer) == 1) {
                 fprintf(stderr, "File is already exists.\n");
@@ -49,8 +47,6 @@ void UdpServer(int server_socket)
                 fclose(fd);
                 continue;
             }
-
-            buffer[bytes_read] = '\0';
 
             int file_size = atoi(buffer);
 
