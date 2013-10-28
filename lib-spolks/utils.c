@@ -1,5 +1,7 @@
 #include "utils.h"
 
+pthread_mutex_t THREAD_SAFE_PRINTF_MUTEX = PTHREAD_MUTEX_INITIALIZER;
+
 // Returns size of file named 'filename' in bytes
 int fsize(char *filename)
 {
@@ -63,5 +65,22 @@ int is_file_exists(char *filename)
         fclose(fd);
         return 1;
     }
+}
+
+// Thread safe version of printf() function
+int _printf(char *format, ...)
+{
+    int ret_val;
+
+    va_list args;
+    va_start(args, format);
+
+    pthread_mutex_lock(&THREAD_SAFE_PRINTF_MUTEX);
+    ret_val = printf(format, args);
+    pthread_mutex_unlock(&THREAD_SAFE_PRINTF_MUTEX);
+
+    va_end(args);
+
+    return ret_val;
 }
 

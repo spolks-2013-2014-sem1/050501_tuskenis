@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <string.h>
+#include <stdarg.h>
+#include <pthread.h>
 
 // Returns size of file named 'filename' in bytes
 int fsize(char *filename);
@@ -25,4 +27,7 @@ int trash_create(char *path, int size);
 
 // Check file for existing
 int is_file_exists(char *filename);
+
+// Thread safe version of printf() function
+int _printf(char *format, ...);
 
