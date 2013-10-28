@@ -5,8 +5,13 @@ namespace
     #define BUFFER_SIZE 256
     char buffer[BUFFER_SIZE];
 
-    map<long, FILE*> mapAddrFile;
-    map<FILE*, int> mapFileSize;
+    struct file_info {
+        FILE *fd;
+        int file_size;
+        int bytes_recieved;
+    };
+
+    map<long, struct file_info*> addr_map;
 }
 
 extern int quit_flag;
@@ -26,7 +31,7 @@ void UdpServer(int server_socket)
 
         long in_addr = address.sin_addr.s_addr; // network address
 
-        if (mapAddrFile.find(in_addr) == mapAddrFile.end()) {
+        if (addr_map.find(in_addr) == addr_map.end()) {
             // here buffer contains filename without string-terminator
             buffer[bytes_read] = '\0';
 
@@ -55,27 +60,31 @@ void UdpServer(int server_socket)
             int file_size = atoi(buffer);
 
             // Save associations
-            mapAddrFile[in_addr] = fd;
-            mapFileSize[fd] = file_size;    
+            struct file_info *fi = new struct file_info;
+            fi->fd = fd;
+            fi->file_size = file_size;
+            fi->bytes_recieved = 0;
+
+            addr_map[in_addr] = fi;
+
         } else {
             // here buffer contains file data
-            FILE *fd = mapAddrFile[in_addr];
-            int file_size = mapFileSize[fd];
+            FILE *fd = addr_map[in_addr]->fd;
+            int file_size = addr_map[in_addr]->file_size;
 
             fwrite(buffer, bytes_read, sizeof(char), fd);
 
-            file_size -= bytes_read;
+            addr_map[in_addr]->bytes_recieved += bytes_read;
 
             // Send reply
             sendto(server_socket, "x", 1, 0, (struct sockaddr*)&address, addr_len);
 
-            if (file_size < 1) {
+            if (addr_map[in_addr]->bytes_recieved >= file_size) {
+                printf("Total bytes recieved: %d\n", addr_map[in_addr]->bytes_recieved);
                 fclose(fd);
-                mapAddrFile.erase(in_addr);
-                mapFileSize.erase(fd);
+                delete (struct file_info*)addr_map[in_addr];
+                addr_map.erase(in_addr);
             }
-
-            mapFileSize[fd] = file_size;
         }
     }
 }

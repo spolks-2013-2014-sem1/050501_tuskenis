@@ -6,9 +6,13 @@ namespace
     #define BUFFER_SIZE 256
     char buffer[BUFFER_SIZE];
 
-    map<int, FILE*> mapSockFile;
-    map<FILE*, int> mapFileSize;
-    map<int, int> mapSockTotalRcv;
+    struct file_info {
+        FILE *fd;
+        int file_size;
+        int bytes_recieved;
+    };
+
+    map<int, struct file_info*> socket_map;
 }
 
 int Accept(int server_socket);
@@ -58,7 +62,7 @@ void TcpServer(int server_socket)
                 if (Recieve(sock) == -1) {
                     perror("Recieve()");
                 }
-                if (mapSockFile.find(sock) == mapSockFile.end()) {
+                if (socket_map.find(sock) == socket_map.end()) {
                     FD_CLR(sock, &sockets);
                 }
             }
@@ -111,9 +115,12 @@ int Accept(int server_socket)
     int file_size = atoi(buffer);
 
     // Save associations
-    mapSockFile[remote_socket] = fd;
-    mapFileSize[fd] = file_size;
-    mapSockTotalRcv[remote_socket] = 0;
+    struct file_info *fi = new struct file_info;
+    fi->fd = fd;
+    fi->file_size = file_size;
+    fi->bytes_recieved = 0;
+
+    socket_map[remote_socket] = fi;
 
     // Allow catching URG signal
     if (fcntl(remote_socket, F_SETOWN, getpid()) == -1)
@@ -124,8 +131,8 @@ int Accept(int server_socket)
 
 int Recieve(int socket_descriptor)
 {
-    FILE *fd = mapSockFile[socket_descriptor];
-    int file_size = mapFileSize[fd];
+    FILE *fd = socket_map[socket_descriptor]->fd;
+    int file_size = socket_map[socket_descriptor]->file_size;
     int bytes_read;
 
     while (quit_flag == 0) {
@@ -143,27 +150,24 @@ int Recieve(int socket_descriptor)
 
     fwrite(buffer, bytes_read, sizeof(char), fd);
 
-    file_size -= bytes_read;
-    mapSockTotalRcv[socket_descriptor] += bytes_read;
+    socket_map[socket_descriptor]->bytes_recieved += bytes_read;
 
-    if (file_size < 1) {
-        printf("Socket %d; Total bytes recieved: %d\n", socket_descriptor, mapSockTotalRcv[socket_descriptor]);
+    if (socket_map[socket_descriptor]->bytes_recieved >= file_size) {
+        printf("Socket %d; Total bytes recieved: %d\n", socket_descriptor, socket_map[socket_descriptor]->bytes_recieved);
         close(socket_descriptor);
         fclose(fd);
-        mapSockFile.erase(socket_descriptor);
-        mapFileSize.erase(fd);
-        mapSockTotalRcv.erase(socket_descriptor);
+        delete (struct file_info*)socket_map[socket_descriptor];
+        socket_map.erase(socket_descriptor);
         return 0;
     }
 
-    mapFileSize[fd] = file_size;
     return 0;
 }
 
 int CheckOOB(int socket_descriptor)
 {
     if (sockatmark(socket_descriptor) == 1) {
-        int bytes_recieved = mapSockTotalRcv[socket_descriptor];
+        int bytes_recieved = socket_map[socket_descriptor]->bytes_recieved;
 
         printf("Socket %d; Recieved %d bytes.\n", socket_descriptor, bytes_recieved);
 
