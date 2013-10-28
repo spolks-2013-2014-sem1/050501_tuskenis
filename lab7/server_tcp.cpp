@@ -7,11 +7,9 @@ namespace
 
     struct thread_arg {
         int socket_descriptor;
-        pthread_t thread_id;
     };
 
     vector<pthread_t*> threads;
-    pthread_mutex_t vector_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 void *RecieveThreadProc(void*);
@@ -27,6 +25,13 @@ void TcpServer(int server_socket)
     }
 
     while (quit_flag == 0) {
+
+        for (int i = 0; i < threads.size(); i++) {
+            if (pthread_tryjoin_np(*threads[i], NULL) == 0) {
+                threads.erase(threads.begin() + i);
+            }
+        }
+
         struct thread_arg *arg = new struct thread_arg;
 
         arg->socket_descriptor = accept(server_socket, NULL, NULL);
@@ -37,9 +42,9 @@ void TcpServer(int server_socket)
             continue;
         }
 
-        threads.push_back(&(arg->thread_id));
+        threads.push_back(new pthread_t);
 
-        if (pthread_create(&(arg->thread_id), NULL, RecieveThreadProc, arg) != 0) {
+        if (pthread_create(threads[threads.size() - 1], NULL, RecieveThreadProc, arg) != 0) {
             perror("pthread_create()");
             threads.pop_back();
             close(arg->socket_descriptor);
@@ -47,37 +52,21 @@ void TcpServer(int server_socket)
         }
     }
 
-    if (pthread_mutex_lock(&vector_mutex) != 0) {
-        perror("pthread_mutex_lock()");
-    }
-
     for (int i = 0; i < threads.size(); i++) {
         pthread_join(*threads[i], NULL);
     }
 
     threads.clear();
-    pthread_mutex_unlock(&vector_mutex);
-    pthread_mutex_destroy(&vector_mutex);
 }
 
 void *RecieveThreadProc(void *arg)
 {
-    pthread_t thread_id = ((struct thread_arg*)arg)->thread_id;
     int socket_descriptor = ((struct thread_arg*)arg)->socket_descriptor;
 
     if (recv_file_tcp(socket_descriptor) == -1) {
         perror("recv_file()");
     }
 
-    if (pthread_mutex_trylock(&vector_mutex) == 0) {
-        for (int i = 0; i < threads.size(); i++) {
-            if (*(threads[i]) == thread_id) {
-                threads.erase(threads.begin() + i);
-                break;
-            }
-        }
-        pthread_mutex_unlock(&vector_mutex);
-    }
     close(socket_descriptor);
     delete (struct thread_arg*)arg;
 }
