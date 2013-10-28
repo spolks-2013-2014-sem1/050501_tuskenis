@@ -68,7 +68,7 @@ int is_file_exists(char *filename)
 }
 
 // Thread safe version of printf() function
-int _printf(char *format, ...)
+int _printf(const char *format, ...)
 {
     int ret_val;
 
