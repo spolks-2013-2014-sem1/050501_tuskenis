@@ -76,7 +76,7 @@ int _printf(const char *format, ...)
     va_start(args, format);
 
     pthread_mutex_lock(&THREAD_SAFE_PRINTF_MUTEX);
-    ret_val = printf(format, args);
+    ret_val = vprintf(format, args);
     pthread_mutex_unlock(&THREAD_SAFE_PRINTF_MUTEX);
 
     va_end(args);
