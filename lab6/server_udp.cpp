@@ -19,7 +19,7 @@ extern int quit_flag;
 void UdpServer(int server_socket)
 {
     struct sockaddr_in address;
-    socklen_t addr_len;    
+    socklen_t addr_len = sizeof(sockaddr_in);    
 
     while(quit_flag == 0) {
         int bytes_read = recvfrom(server_socket, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&address, &addr_len);
