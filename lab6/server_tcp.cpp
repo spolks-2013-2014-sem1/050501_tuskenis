@@ -2,8 +2,9 @@
 
 namespace
 {
-    #define BACKLOG 10
-    #define BUFFER_SIZE 256
+    const int BACKLOG = 10;
+    const int BUFFER_SIZE = 256;
+
     char buffer[BUFFER_SIZE];
 
     struct file_info {
