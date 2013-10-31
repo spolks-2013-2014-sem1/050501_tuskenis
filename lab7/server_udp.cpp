@@ -2,7 +2,8 @@
 
 namespace 
 {
-    #define BUFFER_SIZE 256
+    const int BUFFER_SIZE = 256;
+
     char buffer[BUFFER_SIZE];
 
     struct thread_arg {
