@@ -29,9 +29,9 @@ int send_file_tcp(char *filepath, int socket_descriptor)
     itoa(file_size, buffer);
 
     char *filename = parse_filename(filepath);
-    send(socket_descriptor, filename, strlen(filename), 0);     // Send file name
+    send(socket_descriptor, filename, BUFFER_SIZE, 0);     // Send file name
     free(filename);
-    send(socket_descriptor, buffer, strlen(buffer), 0); // Send file size
+    send(socket_descriptor, buffer, BUFFER_SIZE, 0); // Send file size
 
     // number of file data sending iterations between sending out-of-band data
     int oob_count = (file_size / BUFFER_SIZE) / 5;
@@ -84,9 +84,9 @@ int send_file_udp(char *filepath, int socket_descriptor)
     itoa(file_size, buffer);
 
     char *filename = parse_filename(filepath);
-    send(socket_descriptor, filename, strlen(filename), 0);     // Send file name
+    send(socket_descriptor, filename, BUFFER_SIZE, 0);     // Send file name
     free(filename);
-    send(socket_descriptor, buffer, strlen(buffer), 0); // Send file size
+    send(socket_descriptor, buffer, BUFFER_SIZE, 0); // Send file size
 
     // Send file data
     while (1) {

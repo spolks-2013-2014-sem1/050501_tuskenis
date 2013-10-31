@@ -78,14 +78,12 @@ int Accept(int server_socket)
         return -1;
 
     // Recieve file name
-    int bytes_read = recv(remote_socket, buffer, BUFFER_SIZE - 1, 0);
+    int bytes_read = recv(remote_socket, buffer, BUFFER_SIZE, 0);
 
     if (bytes_read < 1) {
         close(remote_socket);
         return -1;
     }
-
-    buffer[bytes_read] = '\0';
 
     if (is_file_exists(buffer) == 1) {
         fprintf(stderr, "File is already exists.\n");
@@ -102,15 +100,13 @@ int Accept(int server_socket)
     }
 
     // Recieve file size
-    bytes_read = recv(remote_socket, buffer, BUFFER_SIZE - 1, 0);
+    bytes_read = recv(remote_socket, buffer, BUFFER_SIZE, 0);
 
     if (bytes_read < 1) {
         close(remote_socket);
         fclose(fd);
         return -1;
     }
-
-    buffer[bytes_read] = '\0';
 
     int file_size = atoi(buffer);
 
